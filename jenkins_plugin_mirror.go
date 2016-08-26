@@ -35,8 +35,9 @@ func chk_sha1(filePath string, sha1_sum string) bool {
 	
 	hashInBytes := hash.Sum(nil)
 
-	base64str := base64.URLEncoding.EncodeToString(hashInBytes)
+	base64str := base64.StdEncoding.EncodeToString(hashInBytes)
 
+	//fmt.Println("cal sha1:", base64str)
 	if base64str == sha1_sum {
 		return true
 	} else {
@@ -91,6 +92,7 @@ func downloader(prefix string, download_url string, sha1_sum string) {
 	}
 	
 	if !chk_sha1(fullname, sha1_sum) {
+		fmt.Println("chk sha1 failed:", fullname, " sha1:", sha1_sum)
 		os.Remove(fullname)
 		downloadFromUrl(download_url, fullname)
 	}
@@ -111,7 +113,7 @@ func main() {
 
     // then config file settings
 	prefix := "jenkins"
-	host := "repo.dev.netis.com.cn"
+//	host := "repo.dev.netis.com.cn"
 
     configFile, err := os.Open("json")
     if err != nil {
@@ -130,8 +132,8 @@ func main() {
 		sha1_sum, _ := js.Get("plugins").Get(k).Get("sha1").String()
 		downloader(prefix, download_url, sha1_sum)
 
-		new_url := make_new_url(host, prefix, download_url)
-		js.Get("plugins").Get(k).Set("url",new_url)
+//		new_url := make_new_url(host, prefix, download_url)
+//		js.Get("plugins").Get(k).Set("url",new_url)
 	}
 
     w, err := os.Create("./result.json")
